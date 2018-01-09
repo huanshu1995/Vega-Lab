@@ -116,30 +116,23 @@ alpha_rich <- subset(alphadiv, measure == "Richness")
 alpha_even <- subset(alphadiv, measure == "Evenness")
 alpha_faith <- subset(alphadiv, measure == "FaithPD")
 
+breakss <- c("C.26.I","A.26.I","N.26.S","A.26.S","A.30.S","N.30.S","C.30.S","A.30.I",
+             "N.26.I","N.30.I","C.26.S","C.30.I")
+labelss <- c("control","NH3+","NO3-, scarred", "NH3+, scarred","NH3+, scarred, 29","NO3-, scarred, 29","scarred, 29","NH3+, 29",
+             "NO3-","NO3-, 29","scarred","29")
+
 # Three stacked plots of chao1, Simpson, and Faith's PD by treatment and increasing means
 chao <- ggplot(alpha_rich, aes(x = reorder(interaction, mean, FUN = median), y = mean, fill = interaction)) +
   geom_boxplot() + theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1),
-                         axis.title.x = element_blank()) + 
-  scale_x_discrete(breaks=c("C.26.I","A.26.I","N.26.S","A.26.S","A.30.S","N.30.S","C.30.S","A.30.I",
-                            "N.26.I","N.30.I","C.26.S","C.30.I"), labels=c("control","NH3+","NO3-, scarred", "NH3+, scarred",
-                                                                           "NH3+, scarred, 29","NO3-, scarred, 29","scarred, 29","NH3+, 29", "NO3-","NO3-, 29","scarred","29")) +
-  labs(y = "Chao1") 
+  axis.title.x = element_blank()) + scale_x_discrete(breaks=breakss, labels=labelss) + labs(y = "Chao1") 
 
 simp <- ggplot(alpha_even, aes(x = reorder(interaction, mean, FUN = median), y = mean, fill = interaction)) +
   geom_boxplot() + theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1),
-                         axis.title.x = element_blank()) + 
-  scale_x_discrete(breaks=c("C.26.I","A.26.I","N.26.S","A.26.S","A.30.S","N.30.S","C.30.S","A.30.I",
-                            "N.26.I","N.30.I","C.26.S","C.30.I"), labels=c("control","NH3+","NO3-, scarred", "NH3+, scarred",
-                                                                           "NH3+, scarred, 29","NO3-, scarred, 29","scarred, 29","NH3+, 29", "NO3-","NO3-, 29","scarred","29")) +
-  labs(y = "Simpson") 
+  axis.title.x = element_blank()) + scale_x_discrete(breaks=breakss, labels=labelss) + labs(y = "Simpson")  
 
 faith <- ggplot(alpha_faith, aes(x = reorder(interaction, mean, FUN = median), y = mean, fill = interaction)) +
   geom_boxplot() + theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1), 
-                         axis.title.x = element_blank()) + 
-  scale_x_discrete(breaks=c("C.26.I","A.26.I","N.26.S","A.26.S","A.30.S","N.30.S","C.30.S","A.30.I",
-                            "N.26.I","N.30.I","C.26.S","C.30.I"), labels=c("control","NH3+","NO3-, scarred", "NH3+, scarred",
-                                                                           "NH3+, scarred, 29","NO3-, scarred, 29","scarred, 29","NH3+, 29", "NO3-","NO3-, 29","scarred","29")) +
-  labs(y = "Faith's PD") 
+  axis.title.x = element_blank()) + scale_x_discrete(breaks=breakss, labels=labelss) + labs(y = "Faith's PD") 
 
 theme_set(theme_cowplot(font_size=10)) # reduce default font size
 plot_grid(chao,simp,faith, labels = "auto", ncol = 1, align = 'v')
@@ -231,7 +224,7 @@ pairwise.t.test(alpha_rich$mean, alpha_faith$temp, p.adjust.method = "bonferroni
 pairwise.t.test(alpha_rich$mean, alpha_faith$corallivory, p.adjust.method = "bonferroni")
 
 # Linear regression and anova
-reg1 <- lm(alpha_even$mean ~ nutrient*temp*corallivory + tank + colony, data = alpha_even)
+reg1 <- lm(mean ~ nutrient*temp*corallivory + tank + colony, data = alpha_even)
 reg2 <- lm(mean ~ nutrient*temp*corallivory + tank + colony, data = alpha_rich)
 reg3 <- lm(mean ~ nutrient*temp*corallivory + tank + colony, data = alpha_faith)
 
