@@ -72,6 +72,8 @@ for (i in 1:100) {
 # and we only want Chao1, so we select for the first column
 ##
 
+# test
+
 
 ##
 # Calculate the mean and standard deviation per sample for observed richness and inverse simpson's index
