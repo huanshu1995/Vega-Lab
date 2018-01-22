@@ -2,8 +2,6 @@
 ### Alpha diversity measures, graphs, and stats ####
 ####################################################
 
-setwd("/Users/Becca/Dropbox/Microbiome_analysis/mal/")
-
 library('phyloseq'); packageVersion('phyloseq')
 library("ggplot2")
 library('vegan'); packageVersion('vegan')
