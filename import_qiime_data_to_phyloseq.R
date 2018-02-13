@@ -3,7 +3,6 @@
 ########################################################
 
 rm(list=ls())
-setwd("/Users/Becca/Dropbox/Microbiome_analysis/mal/")
 
 
 library(phyloseq)
@@ -13,22 +12,23 @@ library(ape)
 ##
 # Importing data and transformations ##
 # Import qiime mapping file, biom otu table, and tree
-mapfile = "/Users/Becca/Dropbox/Microbiome_analysis/mal/map_int_noneg.txt"
+mapfile = "/filepath/map.txt"
 map = import_qiime_sample_data(mapfile)
 class(map)
 
 # Import tree
-tree = read_tree("/Users/Becca/Dropbox/Microbiome_analysis/mal/rep_set.tre")
+tree = read_tree("/filepath/rep_set.tre")
 
 # This biom file is a result of the pick_open_reference_otu command in qiime1,
 # In qiime1, I already removed mitochondria and chloroplasts, removed otus with < 100 occurrences
 # and samples with < 1000 counts.
-biomfile = "/Users/Becca/Dropbox/Microbiome_analysis/mal/otu_table_mc2_w_tax_no_pynast_failures_newnames_clean_o100_s1000_noneg_filtagain.biom"
+biomfile = "/filepath/otu_table_mc2_w_tax_no_pynast_failures_o100_s1000_filt.biom"
 biom = import_biom(biomfile, parseFunction = parse_taxonomy_default)
 
-qd = merge_phyloseq(map,tree,biom) 
-##
-
+# This should only be done once, before starting analyses because every time you rarefy, it produces a different 
+# table
+min_lib <- min(sample_sums(biom)) qd = merge_phyloseq(map,tree,biom) rarebiom <- rarefy_even_depth(biom,sample.size 
+= min_lib, verbose = FALSE, replace = TRUE)##
 
 ##
 # Various necessary adjustments to the data (Specific to your data)
@@ -41,4 +41,7 @@ rank_names(qd)
 sample_data(qd)$temp=factor(get_variable(qd,"temp"))
 ##
 
-## The phyloseq object qd is now ready to use in diversity analyses
+##
+# Save the Formal class phyloseq to an external file to load in other scripts (qd = qiimedata)
+save(qd, file = "/filepath/qd.RData")
+# The phyloseq object qd is now ready to use in diversity analyses
