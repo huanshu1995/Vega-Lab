@@ -3,7 +3,6 @@
 ########################################################
 
 rm(list=ls())
-setwd("/Users/Becca/Dropbox/Microbiome_analysis/mal/")
 
 library(plotrix)
 
