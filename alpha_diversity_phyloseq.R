@@ -2,6 +2,7 @@
 ### Alpha diversity measures, graphs, and stats ####
 ####################################################
 
+
 library('phyloseq'); packageVersion('phyloseq')
 library("ggplot2")
 library('vegan'); packageVersion('vegan')
@@ -17,89 +18,49 @@ library(cowplot)
 
 # First run import_qiime_data_to_phyloseq.R to get the qd object in the R environment
 
-# Modified from: (http://deneflab.github.io/MicrobeMiseq/demos/mothur_2_phyloseq.html#alpha_diversity)
-
-
-##
-# Minimum number of reads in a sample: establishing the depth to rarefy each sample to for a standard sampling effort
-# Subsample to the minimum number of reads (min_lib). We will repeat this 100 times and average the diversity 
-# estimates from each trial
-min_lib <- min(sample_sums(qd))
-##
 
 
 ##
 # Initialize matrices to store richness and evenness estimates
 nsamp = nsamples(qd)
-trials = 100
 
-richness <- matrix(nrow = nsamp, ncol = trials)
+richness <- matrix(nrow = nsamp)
 row.names(richness) <- sample_names(qd)
 
-evenness <- matrix(nrow =nsamp, ncol = trials)
+evenness <- matrix(nrow =nsamp)
 row.names(evenness) <- sample_names(qd)
 
-faithPD <- matrix(nrow = nsamp, ncol = trials)
+faithPD <- matrix(nrow = nsamp)
 row.names(faithPD) <- sample_names(qd)
 ##
 
 
 ##
-# It is always important to set a seed when you subsample so your result is replicable
-set.seed(3)
-
-# Rarefy the data to an even sampling depth, and calculate different measures of alpha diversity
 # Options for measures = ("Observed", "Chao1", "ACE", "Shannon", "Simpson", "InvSimpson", "Fisher")
-for (i in 1:100) {
-  # Subsample
-  r <- rarefy_even_depth(qd,sample.size = min_lib, verbose = FALSE, replace = TRUE)
   
   # Calculate richness
-  rich <- as.numeric(as.matrix(subset(estimate_richness(r, measures = "Chao1"), select = c(1))))
-  richness[ ,i] <- rich
+  rich <- as.numeric(as.matrix(subset(estimate_richness(qd, measures = "Chao1"), select = c(1))))
+  richness[ ,] <- rich
+  colnames(richness) [1] <- "richness"
   
   # Calculate evenness
-  even <- as.numeric(as.matrix(estimate_richness(r, measures = "Simpson")))
-  evenness[ ,i] <- even
+  even <- as.numeric(as.matrix(estimate_richness(qd, measures = "Simpson")))
+  richness[ ,2] <- even
+  colnames(evenness) [1] <- "evenness"
   
   # Calculate Faith's PD
-  faith <- as.numeric(as.matrix(subset(estimate_pd(r), select = c(1))))  # estimate_pd is a function assigned at the end of the script
-  faithPD[ ,i] <- faith
-}
+  faith <- as.numeric(as.matrix(subset(estimate_pd(qd), select = c(1))))  # estimate_pd is a function assigned at the end of the script
+  faithPD[ ,] <- faith
+  colnames(faithPD) [1] <- "faithPD"
+  
 # Included the subset in "rich" because the Chao1 measurement outputs two measures per sample (Chao1 and se.chao1)
 # and we only want Chao1, so we select for the first column
 ##
 
-# test
-
 
 ##
-# Calculate the mean and standard deviation per sample for observed richness and inverse simpson's index
-# and store those values in a datafram.
-
-# Create a new dataframe to hold the means and standard deviations of richness estimates
-SampleID <- row.names(richness)
-mean <- apply(richness, 1, mean)
-sd <- apply(richness, 1, sd)
-measure <- rep("Richness", nsamp)
-rich_stats <- data.frame(SampleID, mean, sd, measure)
-
-# Create a new dataframe to hold the means and standard deviations of evenness estimates
-SampleID <- row.names(evenness)
-mean <- apply(evenness, 1, mean)
-sd <- apply(evenness, 1, sd)
-measure <- rep("Evenness", nsamp)
-even_stats <- data.frame(SampleID, mean, sd, measure)
-
-# Create a new dataframe to hold the means and standard deviations of Faith's PD estimates
-SampleID <- row.names(faithPD)
-mean <- apply(faithPD, 1, mean)
-sd <- apply(faithPD, 1, sd)
-measure <- rep("FaithPD", nsamp)
-faith_stats <- data.frame(SampleID, mean, sd, measure)
-
 # Combine our estimates for richness and evenness into one dataframe
-alpha <- rbind(rich_stats, even_stats, faith_stats)
+alpha <- merge(richness, evenness[match(rownames(richness))])
 
 # Add the sample metadata into this dataframe using the merge() command
 # I had to change my column name from X.SampleID to SampleID to match alpha
