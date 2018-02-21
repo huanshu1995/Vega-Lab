@@ -33,7 +33,7 @@ is.rooted(phy_tree(qd))
 qd_wu <- distance(qd, method = "wunifrac")
 qd_un <- distance(qd, method = "unifrac")
 qd_bc <- distance(qd, method = "bray")
-qd_bj <- distance(qd, method = "jaccard")
+qd_bj <- distance(qd, method = "jaccard", binary =TRUE)
 head(qd_bc)
 
 # Ordinations for PCoAs
